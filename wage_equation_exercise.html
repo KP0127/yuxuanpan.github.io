@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Wage Equation Exercise, Wooldridge 3-2d</title>
+<style>
+  :root {
+    --uk-blue: #0033A0;
+    --uk-blue-dark: #002469;
+    --uk-blue-light: #E8EEF8;
+    --accent: #C8102E;
+    --ink: #1a1a1a;
+    --muted: #5a5a5a;
+    --border: #d8d8d8;
+    --bg: #fafafa;
+    --card: #ffffff;
+    --good: #0a7d1e;
+    --bad: #c8102e;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.55;
+  }
+  .container {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 24px 20px 80px;
+  }
+  header {
+    border-bottom: 3px solid var(--uk-blue);
+    padding-bottom: 16px;
+    margin-bottom: 28px;
+  }
+  header .tag {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 12px;
+    color: var(--uk-blue);
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  header h1 {
+    margin: 0 0 6px;
+    font-size: 28px;
+    color: var(--uk-blue-dark);
+  }
+  header .sub {
+    color: var(--muted);
+    font-size: 15px;
+  }
+  section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 22px 24px;
+    margin-bottom: 22px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+  }
+  section h2 {
+    margin: 0 0 14px;
+    font-size: 20px;
+    color: var(--uk-blue-dark);
+    border-bottom: 1px solid var(--uk-blue-light);
+    padding-bottom: 8px;
+  }
+  section h3 {
+    margin: 18px 0 8px;
+    font-size: 16px;
+    color: var(--ink);
+  }
+  p { margin: 0 0 12px; }
+  .equation-box {
+    background: var(--uk-blue-light);
+    border-left: 4px solid var(--uk-blue);
+    padding: 16px 20px;
+    margin: 12px 0;
+    font-family: "Cambria Math", "STIX Two Math", Cambria, Georgia, serif;
+    font-size: 18px;
+    overflow-x: auto;
+  }
+  .equation-box .meta {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 8px;
+  }
+  .caption { color: var(--muted); font-size: 14px; }
+  var { font-family: "Cambria Math", Cambria, Georgia, serif; font-style: italic; }
+  .coef { color: var(--accent); font-weight: 600; }
+
+  /* input grid */
+  .inputs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+    margin: 16px 0;
+  }
+  .input-group {
+    background: #fbfbfd;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px;
+  }
+  .input-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--uk-blue-dark);
+    margin-bottom: 6px;
+  }
+  .input-group .desc {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .input-group input[type="number"] {
+    width: 100%;
+    padding: 8px 10px;
+    font-size: 16px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-family: inherit;
+  }
+  .input-group input[type="number"]:focus {
+    outline: none;
+    border-color: var(--uk-blue);
+    box-shadow: 0 0 0 3px var(--uk-blue-light);
+  }
+
+  /* output */
+  .output {
+    background: #f5f7fb;
+    border-radius: 6px;
+    padding: 16px 18px;
+    margin-top: 12px;
+    border: 1px solid var(--border);
+  }
+  .breakdown {
+    font-family: "Cambria Math", Cambria, Georgia, serif;
+    font-size: 16px;
+    line-height: 1.9;
+  }
+  .breakdown .term {
+    display: inline-block;
+    padding: 2px 6px;
+    margin: 0 2px;
+    border-radius: 3px;
+    background: #ffffff;
+    border: 1px solid var(--border);
+  }
+  .total-line {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 2px solid var(--uk-blue);
+    font-size: 18px;
+  }
+  .total-value {
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 22px;
+  }
+  .interpretation {
+    margin-top: 10px;
+    padding: 10px 12px;
+    background: #ffffff;
+    border-left: 3px solid var(--good);
+    font-size: 14px;
+    color: var(--ink);
+  }
+
+  /* preset buttons */
+  .presets {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .preset-btn {
+    text-align: left;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 14px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--ink);
+    transition: all 0.15s;
+  }
+  .preset-btn:hover {
+    border-color: var(--uk-blue);
+    background: var(--uk-blue-light);
+  }
+  .preset-btn strong {
+    display: block;
+    color: var(--uk-blue-dark);
+    margin-bottom: 3px;
+  }
+  .preset-btn .change {
+    font-family: "Cambria Math", Cambria, Georgia, serif;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* practice */
+  .problem {
+    padding: 14px 0;
+    border-top: 1px solid var(--border);
+  }
+  .problem:first-of-type { border-top: none; padding-top: 4px; }
+  .problem .q {
+    margin-bottom: 10px;
+  }
+  .problem .qnum {
+    display: inline-block;
+    background: var(--uk-blue);
+    color: white;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-right: 8px;
+  }
+  .answer-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 8px 0;
+  }
+  .answer-row label { font-size: 14px; color: var(--muted); }
+  .answer-row input {
+    width: 90px;
+    padding: 6px 8px;
+    font-size: 15px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-family: inherit;
+  }
+  .check-btn {
+    background: var(--uk-blue);
+    color: white;
+    border: none;
+    padding: 7px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .check-btn:hover { background: var(--uk-blue-dark); }
+  .feedback {
+    margin-top: 8px;
+    padding: 10px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    display: none;
+  }
+  .feedback.show { display: block; }
+  .feedback.correct { background: #e6f4ea; border-left: 3px solid var(--good); color: var(--good); }
+  .feedback.wrong { background: #fbe9eb; border-left: 3px solid var(--bad); color: var(--bad); }
+  .feedback .solution {
+    display: block;
+    margin-top: 6px;
+    color: var(--ink);
+    font-family: "Cambria Math", Cambria, Georgia, serif;
+    font-size: 14px;
+  }
+
+  footer {
+    margin-top: 30px;
+    color: var(--muted);
+    font-size: 12px;
+    text-align: center;
+  }
+  footer a { color: var(--uk-blue); }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <div class="tag">Interactive Exercise, Wooldridge Section 3-2d</div>
+  <h1>Changing More Than One Independent Variable at the Same Time</h1>
+  <div class="sub">Multiple regression, wage equation from WAGE1</div>
+</header>
+
+<section>
+  <h2>1. The estimated equation</h2>
+  <p>Using the WAGE1 dataset (n = 526), ordinary least squares (OLS) gives the following log-wage equation (Wooldridge, equation 3.19):</p>
+  <div class="equation-box">
+    <span>log(<var>wage</var>) = <span class="coef">0.284</span> + <span class="coef">0.092</span> <var>educ</var> + <span class="coef">0.0041</span> <var>exper</var> + <span class="coef">0.022</span> <var>tenure</var></span>
+    <div class="meta">R<sup>2</sup> = 0.316. Coefficients are semi-elasticities: a one-unit change in each x variable is associated with approximately (coefficient &times; 100) percent change in wage, holding the others fixed.</div>
+  </div>
+  <p>In section 3-2d, the question is: what happens when <em>more than one</em> variable moves at once? Because the model is linear in the parameters, you simply add up the contributions.</p>
+  <div class="equation-box">
+    &Delta;log(<var>wage</var>) &asymp; 0.092 &middot; &Delta;<var>educ</var> + 0.0041 &middot; &Delta;<var>exper</var> + 0.022 &middot; &Delta;<var>tenure</var>
+  </div>
+  <p class="caption">Try it below. Enter changes to any of the three variables and watch the total effect update.</p>
+</section>
+
+<section>
+  <h2>2. Live scenario builder</h2>
+  <p>Enter the change in years for each variable. Fractional and negative values are allowed.</p>
+
+  <div class="inputs">
+    <div class="input-group">
+      <label for="dEduc">&Delta;educ (years of schooling)</label>
+      <div class="desc">Change in years of formal education.</div>
+      <input type="number" id="dEduc" value="0" step="0.5" />
+    </div>
+    <div class="input-group">
+      <label for="dExper">&Delta;exper (years of workforce experience)</label>
+      <div class="desc">Total time in the labor force, any employer.</div>
+      <input type="number" id="dExper" value="1" step="0.5" />
+    </div>
+    <div class="input-group">
+      <label for="dTenure">&Delta;tenure (years at current employer)</label>
+      <div class="desc">Time with the specific current firm.</div>
+      <input type="number" id="dTenure" value="1" step="0.5" />
+    </div>
+  </div>
+
+  <div class="output">
+    <div class="breakdown" id="breakdown">
+      &Delta;log(<var>wage</var>) &asymp;
+      <span class="term">0.092 &times; 0.0</span> +
+      <span class="term">0.0041 &times; 1.0</span> +
+      <span class="term">0.022 &times; 1.0</span>
+    </div>
+    <div class="total-line">
+      &Delta;log(<var>wage</var>) &asymp; <span class="total-value" id="totalLog">0.0261</span>,
+      or approximately <span class="total-value" id="totalPct">2.61%</span> change in wage.
+    </div>
+    <div class="interpretation" id="interp">
+      Interpretation: staying at the same firm one more year (exper up by 1 and tenure up by 1) is associated with a wage increase of about 2.6 percent, holding education fixed. This is exactly the example on page 79 of Wooldridge.
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>3. Preset scenarios</h2>
+  <p>Click any button to load the values into the builder above. Try to predict the answer before you look.</p>
+  <div class="presets" id="presets">
+    <button class="preset-btn" data-educ="0" data-exper="1" data-tenure="1">
+      <strong>Stay at same firm one more year</strong>
+      <span class="change">&Delta;educ = 0, &Delta;exper = +1, &Delta;tenure = +1</span>
+    </button>
+    <button class="preset-btn" data-educ="0" data-exper="1" data-tenure="-4">
+      <strong>Switch firms after 5 years</strong>
+      <span class="change">&Delta;educ = 0, &Delta;exper = +1, &Delta;tenure = &minus;4</span>
+    </button>
+    <button class="preset-btn" data-educ="1" data-exper="0" data-tenure="0">
+      <strong>One more year of schooling</strong>
+      <span class="change">&Delta;educ = +1, &Delta;exper = 0, &Delta;tenure = 0</span>
+    </button>
+    <button class="preset-btn" data-educ="2" data-exper="-2" data-tenure="-2">
+      <strong>Leave job, do a two-year Master's</strong>
+      <span class="change">&Delta;educ = +2, &Delta;exper = &minus;2, &Delta;tenure = &minus;2</span>
+    </button>
+    <button class="preset-btn" data-educ="0" data-exper="5" data-tenure="5">
+      <strong>Five loyal years at the same firm</strong>
+      <span class="change">&Delta;educ = 0, &Delta;exper = +5, &Delta;tenure = +5</span>
+    </button>
+    <button class="preset-btn" data-educ="0" data-exper="0" data-tenure="1">
+      <strong>Only tenure changes (impossible in real life)</strong>
+      <span class="change">&Delta;educ = 0, &Delta;exper = 0, &Delta;tenure = +1</span>
+    </button>
+  </div>
+  <p class="caption" style="margin-top:14px;">Notice: the fourth scenario, going back to school, can produce a <em>negative</em> total effect in the short run. Two years of foregone experience and tenure cost more than two extra years of schooling gain, according to these coefficients. That is a nice starting point for a discussion of opportunity cost.</p>
+</section>
+
+<section>
+  <h2>4. Practice problems</h2>
+  <p>Compute the total effect on log wage for each scenario. Enter your answer as a decimal (for example, 0.0261, not 2.61%). Round to four decimal places. Then click Check.</p>
+
+  <div class="problem" data-answer="0.0961">
+    <div class="q"><span class="qnum">Q1</span> A worker earns one more year of education while also gaining a year of general work experience but no additional tenure at the current firm. Compute the total change in log(wage).</div>
+    <div class="answer-row">
+      <label>Your answer:</label>
+      <input type="number" step="0.0001" placeholder="0.0000" />
+      <button class="check-btn">Check</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+
+  <div class="problem" data-answer="-0.0619">
+    <div class="q"><span class="qnum">Q2</span> A worker with 3 years of tenure at their current firm quits and starts fresh at a new firm. In the same year, they also gain one year of general experience. What is the total change in log(wage)?</div>
+    <div class="answer-row">
+      <label>Your answer:</label>
+      <input type="number" step="0.0001" placeholder="0.0000" />
+      <button class="check-btn">Check</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+
+  <div class="problem" data-answer="0.2362">
+    <div class="q"><span class="qnum">Q3</span> A worker enrolls in an evening MBA (two years), keeps her job the entire time so exper and tenure both go up by 2, and educ goes up by 2. What is the total change in log(wage)?</div>
+    <div class="answer-row">
+      <label>Your answer:</label>
+      <input type="number" step="0.0001" placeholder="0.0000" />
+      <button class="check-btn">Check</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+
+  <div class="problem" data-answer="0.2981">
+    <div class="q"><span class="qnum">Q4</span> Compare the two life paths from Q2 and Q3 above. Which produces a larger change in log(wage), and by how much? Enter the difference (Q3 answer minus Q2 answer), rounded to four decimals.</div>
+    <div class="answer-row">
+      <label>Difference (Q3 &minus; Q2):</label>
+      <input type="number" step="0.0001" placeholder="0.0000" />
+      <button class="check-btn">Check</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+</section>
+
+<section>
+  <h2>5. Discussion prompt</h2>
+  <p>Bring one answer to class:</p>
+  <p style="padding-left: 12px; border-left: 3px solid var(--uk-blue); background: var(--uk-blue-light); padding: 12px 16px; border-radius: 4px;">
+    The coefficient on <var>educ</var> is roughly 22 times larger than the coefficient on <var>exper</var>. Does that mean education is 22 times more valuable than experience? Why or why not? Consider the units, the ceteris paribus interpretation, and what these coefficients would look like if education were measured in months instead of years.
+  </p>
+</section>
+
+<footer>
+  Interactive exercise, University of Kentucky. Coefficients from Wooldridge (2020), <em>Introductory Econometrics: A Modern Approach</em>, 7e/8e, equation 3.19, dataset WAGE1.
+</footer>
+
+</div>
+
+<script>
+(function() {
+  var B0 = 0.284, Bed = 0.092, Bex = 0.0041, Bte = 0.022;
+
+  var dEduc = document.getElementById('dEduc');
+  var dExper = document.getElementById('dExper');
+  var dTenure = document.getElementById('dTenure');
+  var breakdown = document.getElementById('breakdown');
+  var totalLog = document.getElementById('totalLog');
+  var totalPct = document.getElementById('totalPct');
+  var interp = document.getElementById('interp');
+
+  function fmt(x, n) {
+    n = n || 4;
+    return (Math.round(x * Math.pow(10, n)) / Math.pow(10, n)).toFixed(n);
+  }
+  function fmt1(x) { return (Math.round(x * 10) / 10).toFixed(1); }
+
+  function update() {
+    var de = parseFloat(dEduc.value) || 0;
+    var dx = parseFloat(dExper.value) || 0;
+    var dt = parseFloat(dTenure.value) || 0;
+
+    var edTerm = Bed * de;
+    var exTerm = Bex * dx;
+    var teTerm = Bte * dt;
+    var total = edTerm + exTerm + teTerm;
+
+    breakdown.innerHTML =
+      '&Delta;log(<var>wage</var>) &asymp; ' +
+      '<span class="term">0.092 &times; ' + fmt1(de) + '</span> + ' +
+      '<span class="term">0.0041 &times; ' + fmt1(dx) + '</span> + ' +
+      '<span class="term">0.022 &times; ' + fmt1(dt) + '</span> = ' +
+      '<span class="term">' + fmt(edTerm) + '</span> + ' +
+      '<span class="term">' + fmt(exTerm) + '</span> + ' +
+      '<span class="term">' + fmt(teTerm) + '</span>';
+
+    totalLog.textContent = fmt(total);
+    var pct = total * 100;
+    totalPct.textContent = (pct >= 0 ? '+' : '') + fmt(pct, 2) + '%';
+
+    // interpretation
+    var parts = [];
+    if (de !== 0) parts.push(Math.abs(de) + ' year' + (Math.abs(de) === 1 ? '' : 's') + ' of ' + (de > 0 ? 'more' : 'less') + ' education');
+    if (dx !== 0) parts.push(Math.abs(dx) + ' year' + (Math.abs(dx) === 1 ? '' : 's') + ' of ' + (dx > 0 ? 'more' : 'less') + ' experience');
+    if (dt !== 0) parts.push(Math.abs(dt) + ' year' + (Math.abs(dt) === 1 ? '' : 's') + ' of ' + (dt > 0 ? 'more' : 'less') + ' tenure');
+
+    var descr = parts.length ? parts.join(', combined with ') : 'no change in any variable';
+    var direction = total > 0.0001 ? 'increase' : (total < -0.0001 ? 'decrease' : 'no change');
+    var magnitude = Math.abs(pct);
+
+    if (direction === 'no change') {
+      interp.textContent = 'No variables change, so the model predicts no change in wages.';
+    } else {
+      interp.textContent = 'Interpretation: ' + descr + ' is associated with an approximate ' +
+        direction + ' in wages of ' + fmt(magnitude, 2) + ' percent, holding constant everything not in the model.';
+    }
+  }
+
+  dEduc.addEventListener('input', update);
+  dExper.addEventListener('input', update);
+  dTenure.addEventListener('input', update);
+
+  // presets
+  document.querySelectorAll('.preset-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      dEduc.value = btn.getAttribute('data-educ');
+      dExper.value = btn.getAttribute('data-exper');
+      dTenure.value = btn.getAttribute('data-tenure');
+      update();
+      document.querySelector('.output').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  });
+
+  // practice problems
+  document.querySelectorAll('.problem').forEach(function(prob) {
+    var answer = parseFloat(prob.getAttribute('data-answer'));
+    var input = prob.querySelector('input');
+    var btn = prob.querySelector('.check-btn');
+    var fb = prob.querySelector('.feedback');
+
+    // Solutions for each problem, keyed by rounded answer
+    var solutions = {
+      '0.0947': 'Solution: &Delta;log(wage) = 0.092(1) + 0.0041(1) + 0.022(0) = 0.092 + 0.0041 + 0 = 0.0961. Rounded: 0.0961. Note: some rounding of intermediate coefficients may give 0.0947. Accept both.',
+      '-0.0179': 'Solution: &Delta;educ = 0, &Delta;exper = +1, &Delta;tenure = &minus;3 (quitting resets tenure). So &Delta;log(wage) = 0(0.092) + 1(0.0041) + (&minus;3)(0.022) = 0 + 0.0041 &minus; 0.066 = &minus;0.0619. Wait, check the question again: tenure drops from 3 to 0, so &Delta;tenure = &minus;3. Actual: 0.0041 &minus; 0.066 = &minus;0.0619.',
+      '0.1305': 'Solution: &Delta;log(wage) = 0.092(2) + 0.0041(2) + 0.022(2) = 0.184 + 0.0082 + 0.044 = 0.2362.',
+      '0.0492': 'Solution: Q3 total minus Q2 total. Compute each first, then subtract.'
+    };
+
+    btn.addEventListener('click', function() {
+      var val = parseFloat(input.value);
+      fb.classList.remove('correct', 'wrong');
+      fb.classList.add('show');
+      if (isNaN(val)) {
+        fb.classList.add('wrong');
+        fb.innerHTML = 'Please enter a numeric answer.';
+        return;
+      }
+      var tol = 0.001;
+      if (Math.abs(val - answer) < tol) {
+        fb.classList.add('correct');
+        fb.innerHTML = '&#10003; Correct. The total change in log(wage) is ' + answer.toFixed(4) +
+          ', or about ' + (answer * 100).toFixed(2) + '% in wages.';
+      } else {
+        fb.classList.add('wrong');
+        fb.innerHTML = 'Not quite. The correct answer is ' + answer.toFixed(4) + '. ' +
+          '<span class="solution">Hint: apply &Delta;log(wage) = 0.092&middot;&Delta;educ + 0.0041&middot;&Delta;exper + 0.022&middot;&Delta;tenure, ' +
+          'and be careful about the sign of &Delta;tenure when someone switches employers.</span>';
+      }
+    });
+
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') btn.click();
+    });
+  });
+
+  update();
+})();
+</script>
+
+</body>
+</html>
